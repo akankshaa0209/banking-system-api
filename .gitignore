@@ -27,6 +27,7 @@ HELP.md
 Flow.md
 HowLoginWorks.md
 PROCESS.md
+ProcessBackup.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
