@@ -1,4 +1,4 @@
-## Created repo on github and cloned in vscode.
+## Step 1 - Created base repo with dummy structure.
 
 ## Step 2 — Create Spring Boot Project generates the base project structure for a Spring Boot application so you don’t have to manually create configuration files.
 
