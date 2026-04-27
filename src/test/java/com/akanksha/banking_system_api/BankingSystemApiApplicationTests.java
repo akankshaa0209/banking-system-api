@@ -1,4 +1,4 @@
-package com.akanksha.banking_system_api;
+package com.akanksha.bank;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

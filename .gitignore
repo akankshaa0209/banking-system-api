@@ -24,6 +24,9 @@ hs_err_pid*
 replay_pid*
 
 HELP.md
+Flow.md
+HowLoginWorks.md
+PROCESS.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
