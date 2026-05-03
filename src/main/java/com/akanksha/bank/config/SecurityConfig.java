@@ -28,6 +28,12 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll() // login
                         .requestMatchers(HttpMethod.POST, "/users").permitAll() // register only
 
+                        // Admin-only APIs
+                        .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                        // WHY hasRole("ADMIN") and not ROLE_ADMIN?
+                        // Because Spring automatically adds ROLE_... so we just specify ADMIN here.
+                        .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+
                         // Protected any other APIs other than above ones
                         .anyRequest().authenticated())
 

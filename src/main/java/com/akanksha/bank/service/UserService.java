@@ -54,7 +54,12 @@ public class UserService {
         }
 
         // 4. Generate JWT token (optional, can be added to AuthResponse if needed)
-        String token = jwtUtil.generateToken(user.getEmail());
+        // String token = jwtUtil.generateToken(user.getEmail());
+        // Upgrading token generation to include role for role based auth
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name());
+        // Now token stores role too.
 
         return AuthResponse.builder()
                 .message("Login successful")

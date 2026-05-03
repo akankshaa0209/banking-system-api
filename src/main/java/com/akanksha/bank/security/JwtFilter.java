@@ -12,6 +12,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.ArrayList;
 
+// for role based auth in JWT token
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.List;
+
 import java.io.IOException;
 
 @Component
@@ -34,10 +38,18 @@ public class JwtFilter extends OncePerRequestFilter {
 
             try {
                 String email = jwtUtil.extractUsername(token);
+                String role = jwtUtil.extractRole(token); // for role based auth
 
                 // can later set Authentication in SecurityContext here
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email,
-                        null, new ArrayList<>());
+                // UsernamePasswordAuthenticationToken authentication = new
+                // UsernamePasswordAuthenticationToken(email,
+                // null, new ArrayList<>());
+
+                // for role based auth, set role in authentication
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        email,
+                        null,
+                        List.of(new SimpleGrantedAuthority(role)));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 

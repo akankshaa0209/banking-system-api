@@ -14,14 +14,35 @@ public class JwtUtil {
 
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    // Generate Token
-    public String generateToken(String email) {
+    // // Generate Token
+    // public String generateToken(String email) {
+    // return Jwts.builder()
+    // .setSubject(email)
+    // .setIssuedAt(new Date())
+    // .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hr
+    // .signWith(key, SignatureAlgorithm.HS256)
+    // .compact();
+    // }
+
+    // Generate Token for role based auth (role+email)
+    public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hr
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // method to extract role from token
+    public String extractRole(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
     }
 
     // Extract email
