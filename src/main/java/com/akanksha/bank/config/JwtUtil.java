@@ -14,7 +14,7 @@ public class JwtUtil {
 
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    // 🔐 Generate Token
+    // Generate Token
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
@@ -24,22 +24,30 @@ public class JwtUtil {
                 .compact();
     }
 
-    // 🔍 Extract email
+    // Extract email
     public String extractEmail(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    public String extractUsername(String token) {
+        return extractEmail(token); // alias
+    }
+
+    // Extract all claims (clean reuse)
+    private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 
-    // ✅ Validate token
+    // Validate token
     public boolean validateToken(String token) {
         try {
-            extractEmail(token);
+            extractAllClaims(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }

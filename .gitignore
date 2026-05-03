@@ -28,6 +28,8 @@ Flow.md
 HowLoginWorks.md
 PROCESS.md
 ProcessBackup.md
+PostmanTests.md
+JwtWorking.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
