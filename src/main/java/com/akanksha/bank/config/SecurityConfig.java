@@ -20,9 +20,16 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
+
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.disable()) // REQUIRED for H2 UI
+                )
+
                 .authorizeHttpRequests(auth -> auth
 
                         // .anyRequest()
+
+                        .requestMatchers("/h2-console/**").permitAll()
 
                         // Public APIs (no token required)
                         .requestMatchers("/auth/**").permitAll() // login
@@ -33,6 +40,10 @@ public class SecurityConfig {
                         // WHY hasRole("ADMIN") and not ROLE_ADMIN?
                         // Because Spring automatically adds ROLE_... so we just specify ADMIN here.
                         .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+
+                        // USER APIs (Accounts - must be logged in).
+                        // Transfer API is also protected under /accounts/transfer endpoint.
+                        .requestMatchers("/accounts/**").authenticated()
 
                         // Protected any other APIs other than above ones
                         .anyRequest().authenticated())
