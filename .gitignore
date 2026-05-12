@@ -30,6 +30,10 @@ PROCESS.md
 ProcessBackup.md
 PostmanTests.md
 JwtWorking.md
+JwtVsAuthObjVsSecuritContextHolder.md
+StatementAPI.md
+future.md
+Interviewdemo.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

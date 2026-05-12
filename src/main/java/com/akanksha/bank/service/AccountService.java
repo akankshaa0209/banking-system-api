@@ -10,6 +10,7 @@ import com.akanksha.bank.dto.TransferRequest;
 import com.akanksha.bank.dto.DepositRequest;
 import com.akanksha.bank.dto.WithdrawRequest;
 import com.akanksha.bank.dto.TransactionResponse;
+import com.akanksha.bank.dto.StatementResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -208,6 +209,7 @@ public class AccountService {
         return "Amount withdrawn successfully";
     }
 
+    // transaction logging
     public List<TransactionResponse> getTransactions(Long accountId) {
 
         String email = getLoggedInUserEmail();
@@ -222,6 +224,62 @@ public class AccountService {
         return transactionRepository.findByAccountId(accountId)
                 .stream()
                 .map(tx -> TransactionResponse.builder()
+                        .id(tx.getId())
+                        .type(tx.getType().name())
+                        .amount(tx.getAmount())
+                        .fromAccount(tx.getFromAccountId() != null ? tx.getFromAccountId().toString() : null)
+                        .toAccount(tx.getToAccountId() != null ? tx.getToAccountId().toString() : null)
+                        .timestamp(tx.getTimestamp())
+                        .build())
+                .toList();
+    }
+
+    // for bank statement API with filters
+    public List<StatementResponse> getStatement(
+            Long accountId,
+            LocalDateTime from,
+            LocalDateTime to,
+            String type) {
+
+        String email = getLoggedInUserEmail();
+
+        // 1. Validate ownership
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
+        if (!account.getUser().getEmail().equals(email)) {
+            throw new BadRequestException("Access denied");
+        }
+
+        // 2. Fetch transactions based on filters
+        List<Transaction> transactions;
+
+        if (type != null && from != null && to != null) {
+            transactions = transactionRepository
+                    .findByAccountIdAndTypeAndTimestampBetweenOrderByTimestampDesc(
+                            accountId,
+                            TransactionType.valueOf(type),
+                            from,
+                            to);
+        } else if (type != null) {
+            transactions = transactionRepository
+                    .findByAccountIdAndTypeOrderByTimestampDesc(
+                            accountId,
+                            TransactionType.valueOf(type));
+        } else if (from != null && to != null) {
+            transactions = transactionRepository
+                    .findByAccountIdAndTimestampBetweenOrderByTimestampDesc(
+                            accountId,
+                            from,
+                            to);
+        } else {
+            transactions = transactionRepository
+                    .findByAccountIdOrderByTimestampDesc(accountId);
+        }
+
+        // 3. Map to response
+        return transactions.stream()
+                .map(tx -> StatementResponse.builder()
                         .id(tx.getId())
                         .type(tx.getType().name())
                         .amount(tx.getAmount())
