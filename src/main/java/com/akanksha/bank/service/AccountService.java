@@ -20,6 +20,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+// For pagination, we can return Page<TransactionResponse> instead of List<TransactionResponse>
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 @Service
 public class AccountService {
 
@@ -299,5 +304,32 @@ public class AccountService {
                         .timestamp(tx.getTimestamp())
                         .build())
                 .toList();
+    }
+
+    // pagination method
+    public Page<TransactionResponse> getTransactionsPaginated(
+            Long accountId,
+            int page,
+            int size) {
+
+        String email = getLoggedInUserEmail();
+
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
+        if (!account.getUser().getEmail().equals(email)) {
+            throw new BadRequestException("Access denied");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return transactionRepository
+                .findByAccountId(accountId, pageable)
+                .map(tx -> TransactionResponse.builder()
+                        .id(tx.getId())
+                        .type(tx.getType().name())
+                        .amount(tx.getAmount())
+                        .timestamp(tx.getTimestamp())
+                        .build());
     }
 }

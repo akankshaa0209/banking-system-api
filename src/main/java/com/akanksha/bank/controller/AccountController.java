@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.time.LocalDateTime;
 
+// For pagination
+import org.springframework.data.domain.Page;
+
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
@@ -94,5 +97,15 @@ public class AccountController {
         LocalDateTime toDate = (to != null) ? LocalDateTime.parse(to) : null;
 
         return accountService.getStatement(id, fromDate, toDate, type);
+    }
+
+    // pagination api
+    @GetMapping("/{id}/transactions/paginated")
+    public Page<TransactionResponse> getTransactionsPaginated(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        return accountService.getTransactionsPaginated(id, page, size);
     }
 }
