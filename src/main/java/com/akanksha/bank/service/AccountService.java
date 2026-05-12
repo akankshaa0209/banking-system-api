@@ -91,14 +91,25 @@ public class AccountService {
             throw new BadRequestException("Amount must be greater than 0");
         }
 
-        if (request.getFromAccountId().equals(request.getToAccountId())) {
+        // if (request.getFromAccountId().equals(request.getToAccountId())) {
+        // throw new BadRequestException("Cannot transfer to same account");
+        // }
+
+        // Use account numbers instead of IDs for better security and usability
+        if (request.getFromAccountNumber().equals(request.getToAccountNumber())) {
             throw new BadRequestException("Cannot transfer to same account");
         }
 
-        Account fromAccount = accountRepository.findById(request.getFromAccountId())
+        Account fromAccount = accountRepository
+                // .findById(request.getFromAccountId())
+                // use account number instead of ID for better security and usability
+                .findByAccountNumber(request.getFromAccountNumber())
                 .orElseThrow(() -> new ResourceNotFoundException("From account not found"));
 
-        Account toAccount = accountRepository.findById(request.getToAccountId())
+        Account toAccount = accountRepository
+                // .findById(request.getToAccountId())
+                // use account number instead of ID for better security and usability
+                .findByAccountNumber(request.getFromAccountNumber())
                 .orElseThrow(() -> new ResourceNotFoundException("To account not found"));
 
         if (!fromAccount.getUser().getEmail().equals(email)) {
